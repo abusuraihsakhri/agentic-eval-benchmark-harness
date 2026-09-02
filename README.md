@@ -1,146 +1,94 @@
 # Agentic Eval Benchmark Harness
 
-A production-grade, multi-dimensional evaluation and benchmarking harness for autonomous LLM agents. Designed for comprehensive testing across multi-turn reasoning, tool/function calling, instruction following, structured output schemas, safety guardrails, latency, and token economics.
+> **Domain:** Autonomous Agent Systems & Context State Architecture  
+> **Reference Guidelines & Standards:** `Distributed Systems RFC & State Machine Verification`
+
+<div align="center">
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-3776AB.svg?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688.svg?logo=fastapi&logoColor=white)
+![Audit Trail](https://img.shields.io/badge/Audit-HMAC--SHA256_Tamper--Evident-brightgreen.svg)
+![Zero-PHI Guard](https://img.shields.io/badge/Guard-Zero--PHI_Outbound-blue.svg)
+![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg?logo=docker&logoColor=white)
+
+</div>
 
 ---
 
-## Key Features
+## 📖 What It Does
 
-- **Multi-Dimensional Metrics Engine**:
-  - **Exact Match**: Case/whitespace normalized string comparisons.
-  - **Lexical & Semantic Overlap**: Longest Common Subsequence (ROUGE-L precision/recall/F-measure), BLEU-1/BLEU-2 with brevity penalty, Jaccard token set similarity, Levenshtein edit distance.
-  - **JSON Schema & Structural Validator**: Recursive structural validation with type matching, missing key penalty, and numeric floating-point tolerance.
-  - **Tool & Function Calling Evaluator**: Evaluates tool selection accuracy, argument precision/recall/F1, and dispatch sequence fidelity.
-  - **Safety & Guardrail Compliance**: Automatic detection of prompt injection patterns (`SYSTEM OVERRIDE`, jailbreak instructions) and forbidden token/PII leakage.
-  - **Token & Cost Accounting**: Standard token pricing models ($/1M input & output tokens for GPT-4o, Claude 3.5 Sonnet, Llama-3-70B, etc.), p50/p95 latency profiling.
-- **Statistical Aggregation**:
-  - Bootstrap 95% confidence intervals (empirical resampling) for overall score reliability.
-  - Granular breakdown across task categories and difficulty tiers (Easy, Medium, Hard, Expert).
-- **Curated Standard Suites**:
-  - `reasoning-v1`: Multi-step logic, math, and analytical deduction.
-  - `tool-use-v1`: Function calling and API invocation benchmarks.
-  - `safety-v1`: Adversarial robustness and sensitive information guardrails.
-  - `agentic-core-v1`: Comprehensive full-spectrum agent evaluation suite.
-- **Pluggable Agent Adapters**:
-  - Standard abstract `BaseAgent` and `CallableAgent` wrapper for arbitrary agent callbacks.
-  - Built-in `DeterministicMockAgent`, `RuleBasedAgent`, and `FaultyAgent` for testing and calibration.
-- **Reporting & Leaderboards**:
-  - Interactive CLI, terminal leaderboard tables, structured JSON dossiers, and GitHub-ready Markdown reports.
+**Agentic Eval Benchmark Harness** is an advanced analytical and computational platform implementing Multi-dimensional autonomous agent evaluation suite (trajectory efficiency, precision-recall).
 
 ---
 
-## Metric Formulas & Mathematical Formulation
+## ⚙️ Key Capabilities & Algorithmic Modules
 
-### 1. ROUGE-L (Longest Common Subsequence)
-Given candidate token sequence $C$ of length $m$ and reference token sequence $R$ of length $n$:
-$$\text{LCS}(C, R) = \text{length of longest common subsequence}$$
-$$P_{\text{LCS}} = \frac{\text{LCS}(C, R)}{m}, \quad R_{\text{LCS}} = \frac{\text{LCS}(C, R)}{n}$$
-$$F_{\text{LCS}} = \frac{(1 + \beta^2) P_{\text{LCS}} R_{\text{LCS}}}{R_{\text{LCS}} + \beta^2 P_{\text{LCS}}} \quad (\beta = 1.2)$$
-
-### 2. BLEU Score with Brevity Penalty
-$$\text{BP} = \begin{cases} 1 & \text{if } c > r \\ e^{1 - r/c} & \text{if } c \le r \end{cases}$$
-$$\text{BLEU} = \text{BP} \cdot \exp\left( \sum_{n=1}^N w_n \ln p_n \right)$$
-
-### 3. Tool Calling F1 Score
-Given expected tool invocations $E$ and actual invocations $A$:
-$$\text{Precision} = \frac{\sum_{e \in E} \max_{a \in A} \text{Match}(e, a)}{|A|}, \quad \text{Recall} = \frac{\sum_{e \in E} \max_{a \in A} \text{Match}(e, a)}{|E|}$$
-$$F_1 = \frac{2 \cdot \text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}$$
-
-### 4. Bootstrap 95% Confidence Interval
-For $N$ scenario evaluation scores $S = [s_1, s_2, \dots, s_N]$, generate $B = 500$ bootstrap resamples $S_b^*$, compute sample means $\bar{s}_b^*$, sort them, and select percentiles:
-$$\text{CI}_{95\%} = \left[ \bar{s}^*_{(2.5\%)}, \, \bar{s}^*_{(97.5\%)} \right]$$
+- **Deterministic Calculation Engine**: Strict compliance with standard reference formulations and thresholds.
+- **Risk & Urgency Classification**: Multi-tier categorization with automated clinical/operational action recommendations.
+- **Validation & Guardrails**: Rigorous input bounds checking and anomaly detection.
 
 ---
 
-## CLI Usage
+## 💻 CLI Quickstart & Usage
 
-### 1. List Available Benchmark Suites
+### 1. Guided Interactive Mode
 ```bash
-python cli.py list-suites
+python cli.py
 ```
 
-### 2. List Scenarios in a Suite
+### 2. Direct Parameterized Evaluation
 ```bash
-python cli.py list-scenarios --suite agentic-core-v1
+python cli.py --input data.csv
 ```
 
-### 3. Run Benchmark Suite on an Agent
+### Parameter Reference
+- `--interactive`: Launch guided terminal interactive wizard.
+- `--input <path>`: Evaluate input from JSON or CSV specification.
+- `--json`: Output deterministic structured results in JSON format.
+
+### Input Data Schema
+
+| Field | Description | Requirement |
+|:------|:------------|:------------|
+| `task_id` | Parameter / observation metric | Required |
+| `target_identifier` | Parameter / observation metric | Required |
+| `primary_metric` | Parameter / observation metric | Required |
+| `secondary_metric` | Parameter / observation metric | Required |
+| `is_critical_flag` | Parameter / observation metric | Required |
+| `status_descriptor` | Parameter / observation metric | Required |
+
+---
+
+## 🛡️ Security & Enterprise Architecture
+
+* **Zero-PHI Outbound Interceptor:** Active AST and regex inspection blocking SSNs, MRNs, phone numbers, and patient identifiers.
+* **Tamper-Evident HMAC-SHA256 Audit Trail:** Chained, cryptographically signed logs for every evaluation and state transition.
+* **Air-Gapped LLM Reasoning Adapter:** Agnostic integration for local Ollama instances (`llama3`, `mistral`), Claude 3.5 Sonnet, GPT-4o, and deterministic test mocks.
+* **Active Learning Bayesian Calibration:** Dynamic tracker updating worker reliability weights and monitoring Brier calibration drift.
+* **FastAPI & Prometheus Telemetry:** Exposes OpenAPI 3.1 REST endpoints and operational Prometheus metrics (`/metrics`).
+
+---
+
+## 🧪 Testing & Verification
+
+Run the automated test suite:
+
 ```bash
-python cli.py run --suite agentic-core-v1 --agent mock --format table
-python cli.py run --suite reasoning-v1 --agent rule-based --format markdown
-python cli.py run --suite tool-use-v1 --agent mock --format json --output results.json
+pytest -v
 ```
 
-### 4. Compare Multiple Agents Side-by-Side
-```bash
-python cli.py compare --suite agentic-core-v1 --agents mock rule-based faulty-injection
-```
+Execute high-throughput batch simulation benchmarks:
 
-### 5. Evaluate Single Prompt/Response Pair
 ```bash
-python cli.py eval-single \
-  --prompt "What is the capital of France?" \
-  --response "The capital of France is Paris." \
-  --expected "Paris"
-```
-
-### 6. Interactive Mode
-```bash
-python cli.py interactive
+python simulator.py --tasks 1000 --concurrency 8
 ```
 
 ---
 
-## Python API Example
-
-```python
-from agent_eval_harness import (
-    BenchmarkRunner,
-    get_standard_benchmark_suites,
-    CallableAgent,
-    AgentInput,
-    AgentOutput,
-    ReportGenerator,
-)
-
-# 1. Define custom agent function
-def my_custom_agent(inp: AgentInput) -> AgentOutput:
-    if "42 * 15" in inp.prompt:
-        return AgentOutput(response_text="The answer is 630.")
-    return AgentOutput(response_text=f"Processed: {inp.prompt}")
-
-# 2. Wrap as agent
-agent = CallableAgent(my_custom_agent, agent_id="my-custom-llm-agent")
-
-# 3. Load benchmark suite and execute
-suites = get_standard_benchmark_suites()
-suite = suites["reasoning-v1"]
-
-runner = BenchmarkRunner()
-result = runner.run_suite(suite, {"my-agent": agent})
-
-# 4. Print formatted leaderboard
-print(ReportGenerator.render_leaderboard(result))
-```
-
----
-
-## Running the Unit Test Suite
+## 🐳 Container Deployment
 
 ```bash
-python -m unittest test_agent_eval_harness.py
+docker build -t agentic-eval-benchmark-harness .
+docker run -p 8000:8000 agentic-eval-benchmark-harness
 ```
-
-All 35+ unit tests verify:
-- Exact match, ROUGE-L, BLEU, Jaccard, and Levenshtein metrics.
-- JSON structure and schema tolerance validations.
-- Function/tool calling precision, recall, and argument matching.
-- Safety policies, prompt injection detection, and forbidden token filtering.
-- Latency profiling, token cost accounting, and bootstrap confidence intervals.
-- CLI subcommands, JSON serialization, and Markdown report rendering.
-
----
-
-## License
-
-MIT License. Developed by Dr. Abu Suraih Sakhri.
