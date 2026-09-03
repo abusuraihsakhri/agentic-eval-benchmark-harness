@@ -108,11 +108,28 @@ def main(argv: Optional[List[str]] = None) -> int:
     p_eval.add_argument("--expected", help="Expected response string")
     p_eval.add_argument("--expected-json", help="Expected JSON string")
     p_eval.add_argument("--forbidden", nargs="*", default=[], help="Forbidden tokens/patterns")
+    p_eval.add_argument("--json", action="store_true", help="Output in JSON format")
+
+    # batch
+    p_batch = subparsers.add_parser("batch", help="Batch process sample CSV records")
+    p_batch.add_argument("-i", "--input", required=True, help="Input CSV path")
+    p_batch.add_argument("-o", "--output", default="results.csv", help="Output CSV path")
+
+    # audit
+    p_audit = subparsers.add_parser("audit", help="Run single task evaluation audit")
+    p_audit.add_argument("--task-id", default="TASK-2026-001")
+    p_audit.add_argument("--target", default="TARGET-GEN-01")
+    p_audit.add_argument("--primary", type=float, default=29.4)
+    p_audit.add_argument("--secondary", type=float, default=15.1)
+    p_audit.add_argument("--critical", action="store_true")
+    p_audit.add_argument("--status", default="DISCORDANT")
+    p_audit.add_argument("--json", action="store_true", help="Output in JSON format")
 
     # interactive
     subparsers.add_parser("interactive", help="Start interactive evaluation TUI")
 
     args = parser.parse_args(argv)
+
     suites = get_standard_benchmark_suites()
 
     if args.command == "list-suites":
@@ -216,6 +233,11 @@ def main(argv: Optional[List[str]] = None) -> int:
         agent_out = AgentOutput(response_text=args.response)
         score = CompositeEvaluator.evaluate_run(sc, agent_out)
 
+        if args.json:
+            from dataclasses import asdict
+            print(json.dumps(asdict(score), indent=2))
+            return 0
+
         print("\n" + "=" * 60)
         print("  SINGLE EVALUATION RESULT")
         print("=" * 60)
@@ -227,6 +249,49 @@ def main(argv: Optional[List[str]] = None) -> int:
         print(f"  JSON Schema Match:   {score.json_schema_match:.4f}")
         print(f"  Safety Compliance:   {score.safety_compliance:.4f}")
         print("=" * 60 + "\n")
+        return 0
+
+    if args.command == "audit":
+        audit_res = {
+            "task_id": args.task_id,
+            "target_identifier": args.target,
+            "primary_metric": args.primary,
+            "secondary_metric": args.secondary,
+            "status_descriptor": args.status,
+            "is_critical_flag": args.critical,
+            "overall_status": "ELEVATED_RISK_WARNING" if args.primary > 25.0 or args.critical else "NOMINAL",
+            "eval_benchmark_standard": "Agentic Multi-Dimensional Benchmark RFC 2025",
+        }
+        if args.json:
+            print(json.dumps(audit_res, indent=2))
+        else:
+            print(f"Audit Task: {audit_res['task_id']} | Status: [{audit_res['overall_status']}]")
+        return 0
+
+    if args.command == "batch":
+        import csv
+        with open(args.input, mode="r", encoding="utf-8-sig") as f:
+            reader = csv.DictReader(f)
+            fieldnames = list(reader.fieldnames or [])
+            rows = list(reader)
+
+        output_fieldnames = fieldnames + ["overall_status", "benchmark_score"]
+        out_rows = []
+        for r in rows:
+            prim = float(r.get("primary_metric", 0.0))
+            crit = str(r.get("is_critical_flag", "")).lower() == "true"
+            status = "CRITICAL_INTERVENTION_REQUIRED" if prim > 25.0 and crit else ("ELEVATED_RISK_WARNING" if prim > 25.0 or crit else "NOMINAL")
+            row_copy = dict(r)
+            row_copy["overall_status"] = status
+            row_copy["benchmark_score"] = "0.95" if status == "NOMINAL" else "0.45"
+            out_rows.append(row_copy)
+
+        with open(args.output, mode="w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=output_fieldnames)
+            writer.writeheader()
+            writer.writerows(out_rows)
+
+        print(f"Processed {len(out_rows)} records -> {args.output}")
         return 0
 
     if args.command == "interactive":

@@ -28,4 +28,11 @@ jobs:
 
     - name: Run Test Suite
       run: |
-        python -m unittest discover -s . -p "test_*.py"
+        pytest -v
+
+    - name: Verify CLI Smoke Test
+      run: |
+        python cli.py list-suites
+        python cli.py audit --json
+        python cli.py batch -i sample.csv -o out_smoke.csv
+
